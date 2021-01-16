@@ -5,10 +5,10 @@ SEN0308, 5V, 2 GND
 int PUMP_PIN = 2;
 int SENSOR_PIN = A1;
 
-int SENSOR_AIR_VALUE = 585;
-int SENSOR_WATER_VALUE = 72;  // At 100mm - "recommended" depth
+int SENSOR_AIR_VALUE = 582;
+int SENSOR_WATER_VALUE = 17;  // At 100mm - "recommended" depth
 
-float HUMIDITY_THRESHOLD = 0.5;
+float HUMIDITY_THRESHOLD = 0.4;
 int HUMIDITY_CHECK_INTERVAL_SEC = 5;
 int TURN_PUMP_FOR_SEC = 2;
 
