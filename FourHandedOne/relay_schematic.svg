@@ -42,7 +42,7 @@
      showgrid="false"
      inkscape:zoom="3.842866"
      inkscape:cx="162.53754"
-     inkscape:cy="370.31797"
+     inkscape:cy="411.95356"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
@@ -2076,7 +2076,7 @@ rect, circle, ellipse, polyline, line, polygon, path {shape-rendering:crispEdges
            font-style=""
            dominant-baseline=""
            id="text432"
-           style="font-size:9.33333302px;font-family:Arial;text-anchor:start;fill:#000080">DFRobot SEN0193</text>
+           style="font-size:9.33333302px;font-family:Arial;text-anchor:start;fill:#000080">DFRobot SEN0114</text>
       </g>
       <g
          c_partid="part_annotation"

@@ -1,6 +1,6 @@
 /*
 Relay shield (DFRobot)
-Sensors: SEN0193
+Sensors: SEN0114
 LCD: LCD1602 Module v1.0 (DFRobot)
 Flowers: Ivy
 
@@ -23,11 +23,11 @@ int SENSOR_PIN = A1;
 int DIAL_MIN_VALUE = 1023;
 int DIAL_MAX_VALUE = 0;
 
-int SENSOR_AIR_VALUES[] = {512};
-int SENSOR_WATER_VALUES[] = {238};
+int SENSOR_AIR_VALUES[] = {0};
+int SENSOR_WATER_VALUES[] = {877};
 
-//Ivy
-float HUMIDITY_THRESHOLDS[] = {0.27};
+//Values are 0..100
+int HUMIDITY_THRESHOLDS[] = {30};
 
 int HUMIDITY_CHECK_INTERVAL_SEC = 5;
 int TURN_PUMP_FOR_SEC = 2;
@@ -48,7 +48,7 @@ void loop() {
     lcdOff();
   }
   for (int i = 0; i < NUM_SENSORS; ++i) {
-    float humidity = calcHumidity(i, analogRead(SENSOR_PINS[i]));
+    int humidity = calcHumidity(i, analogRead(SENSOR_PINS[i]));
     if (humidity < HUMIDITY_THRESHOLDS[i]) {
       pump(i);
     }
@@ -56,8 +56,8 @@ void loop() {
   delay(HUMIDITY_CHECK_INTERVAL_SEC * 1000);
 }
 
-float calcHumidity(int sensorIndex, int sensorValue) {
-  return (float)(sensorValue - SENSOR_AIR_VALUES[sensorIndex]) / (float)(SENSOR_WATER_VALUES[sensorIndex] - SENSOR_AIR_VALUES[sensorIndex]);
+int calcHumidity(int sensorIndex, int sensorValue) {
+  return map(sensorValue, SENSOR_AIR_VALUES[sensorIndex], SENSOR_WATER_VALUES[sensorIndex], 0, 100);
 }
 
 //0 - display is turned off, 1..NUM_SENSORS - show humidity value for given sensor
@@ -77,13 +77,13 @@ void pump(int pumpIndex) {
 
 void showOnLcd(int sensorIndex) {
   int sensorValue = analogRead(SENSOR_PINS[sensorIndex]);
-  int humidityPercent = 100 * calcHumidity(sensorIndex, sensorValue);
+  int humidity = calcHumidity(sensorIndex, sensorValue);
   lcdOn();
   lcd.clear();
   lcd.print("S");
   lcd.print(sensorIndex + 1);
   lcd.print(": ");
-  lcd.print(humidityPercent);
+  lcd.print(humidity);
   lcd.print("%, (");
   lcd.print(sensorValue);
   lcd.print(")");
