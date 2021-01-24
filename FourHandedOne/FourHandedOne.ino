@@ -1,8 +1,8 @@
 /*
 Relay shield (DFRobot)
-Sensors: SEN0114
+Sensors: SEN0114, SEN0308 (2GND)
 LCD: LCD1602 Module v1.0 (DFRobot)
-Flowers: Ivy
+Flowers: Ivy, Thuja
 
 DFR0554 lib is required for LCD
 */
@@ -13,29 +13,30 @@ DFR0554 lcd = DFR0554();
 byte LCD_BRIGHTNESS = 100; // from 0 to 255
 boolean lcdIsOn;
 
-int NUM_SENSORS = 1;
+int NUM_PLANTS = 2;
 
 int DIAL_PIN = A0;
-int SENSOR_PINS[] = {A1};
-int PUMP_PINS[] = {2};
-int SENSOR_PIN = A1;
+// Don't use A4 and A5 - they acts also as SCL and SDA for IIC port (used for LCD)
+int SENSOR_PINS[] = {A1, A3};
+int PUMP_PINS[] = {2, 7};
 
 int DIAL_MIN_VALUE = 1023;
 int DIAL_MAX_VALUE = 0;
 
-int SENSOR_AIR_VALUES[] = {0};
-int SENSOR_WATER_VALUES[] = {877};
+int SENSOR_AIR_VALUES[] = {0, 582};
+int SENSOR_WATER_VALUES[] = {877, 17};
 
 //Values are 0..100
-int HUMIDITY_THRESHOLDS[] = {30};
+int HUMIDITY_THRESHOLDS[] = {30, 40};
 
 int HUMIDITY_CHECK_INTERVAL_SEC = 5;
 int TURN_PUMP_FOR_SEC = 2;
 
+long noPumpCycles[] = {0, 0};
 
 void setup() {
   lcd.begin(&Wire);
-  for (int i = 0; i < NUM_SENSORS; ++i) {
+  for (int i = 0; i < NUM_PLANTS; ++i) {
     pinMode(PUMP_PINS[i], OUTPUT);
   }
 }
@@ -47,10 +48,13 @@ void loop() {
   } else {
     lcdOff();
   }
-  for (int i = 0; i < NUM_SENSORS; ++i) {
+  for (int i = 0; i < NUM_PLANTS; ++i) {
     int humidity = calcHumidity(i, analogRead(SENSOR_PINS[i]));
     if (humidity < HUMIDITY_THRESHOLDS[i]) {
       pump(i);
+      noPumpCycles[i] = 0;
+    } else {
+      ++noPumpCycles[i];
     }
   }
   delay(HUMIDITY_CHECK_INTERVAL_SEC * 1000);
@@ -60,12 +64,12 @@ int calcHumidity(int sensorIndex, int sensorValue) {
   return map(sensorValue, SENSOR_AIR_VALUES[sensorIndex], SENSOR_WATER_VALUES[sensorIndex], 0, 100);
 }
 
-//0 - display is turned off, 1..NUM_SENSORS - show humidity value for given sensor
+//0 - display is turned off, 1..NUM_PLANTS - show humidity value for given sensor
 int calcDialPosition(int dialValue) {
   float dialPercentage = (float)(dialValue - DIAL_MIN_VALUE) / (float)(DIAL_MAX_VALUE - DIAL_MIN_VALUE);
-  int value = dialPercentage * (NUM_SENSORS + 1);
+  int value = dialPercentage * (NUM_PLANTS + 1);
   if (value < 0) return 0;
-  if (value > NUM_SENSORS) return NUM_SENSORS;
+  if (value > NUM_PLANTS) return NUM_PLANTS;
   return value;
 }
 
@@ -87,6 +91,9 @@ void showOnLcd(int sensorIndex) {
   lcd.print("%, (");
   lcd.print(sensorValue);
   lcd.print(")");
+  lcd.setCursorPosition(1, 0);
+  lcd.print("NPC: ");
+  lcd.print(noPumpCycles[sensorIndex]);
 }
 
 void lcdOn() {
