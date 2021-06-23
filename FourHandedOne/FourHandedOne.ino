@@ -1,6 +1,6 @@
 /*
 Relay shield (DFRobot)
-Sensors: SEN0114, SEN0308 (2GND)
+Sensors: SEN0193, SEN0308 (2GND)
 LCD: LCD1602 Module v1.0 (DFRobot)
 Flowers: Ivy, Thuja
 
@@ -23,11 +23,14 @@ int PUMP_PINS[] = {2, 7};
 int DIAL_MIN_VALUE = 1023;
 int DIAL_MAX_VALUE = 0;
 
-int SENSOR_AIR_VALUES[] = {0, 582};
-int SENSOR_WATER_VALUES[] = {877, 17};
+int SENSOR_AIR_VALUES[] = {511, 582};
+int SENSOR_WATER_VALUES[] = {238, 17};
 
-//Values are 0..100
-int HUMIDITY_THRESHOLDS[] = {30, 40};
+// Values are 0..100
+// Normal
+// int HUMIDITY_THRESHOLDS[] = {42, 40};
+// Hot weather (>25C)
+int HUMIDITY_THRESHOLDS[] = {50, 42};
 
 int HUMIDITY_CHECK_INTERVAL_SEC = 5;
 int TURN_PUMP_FOR_SEC = 2;
@@ -94,6 +97,10 @@ void showOnLcd(int sensorIndex) {
   lcd.setCursorPosition(1, 0);
   lcd.print("NPC: ");
   lcd.print(noPumpCycles[sensorIndex]);
+  lcd.print(" ");
+  //Approximate numbr of hours without watering
+  lcd.print(noPumpCycles[sensorIndex] * HUMIDITY_CHECK_INTERVAL_SEC / 3600);
+  lcd.print("h");
 }
 
 void lcdOn() {
